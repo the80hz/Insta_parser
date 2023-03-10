@@ -3,3 +3,6 @@
 /venv/
 /build/
 /temp/*
+
+users.txt
+posts.csv
