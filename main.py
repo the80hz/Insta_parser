@@ -9,7 +9,6 @@ def main():
     client.login(auth_data.username[1], auth_data.password[1])
 
     while True:
-        user = ''
         # read lines in file
         with open('posts.csv', 'r') as f:
             lines = f.readlines()
