@@ -2,4 +2,8 @@
 /.vscode/
 /venv/
 /build/
+/__pycache__/
 /temp/*
+
+posts.csv
+users.csv
