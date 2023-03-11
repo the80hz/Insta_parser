@@ -8,9 +8,61 @@ from selenium.webdriver.common.by import By
 from auth_data import username, password
 
 
-def hashtag_search(_username, _password, _geotag, _file):
-    browser = webdriver.Chrome('../chromedriver/chromedriver')
+def get_posts_by_geo(_geotag, _filename, _browser):
+    try:
+        _browser.get(
+            f'https://www.instagram.com/explore/locations/{_geotag}/')
+        time.sleep(5)
 
+        while True:
+            _browser.execute_script(
+                "window.scrollTo(0, document.body.scrollHeight);")
+            time.sleep(random.randrange(3, 5))
+
+            hrefs = _browser.find_elements(By.TAG_NAME, 'a')
+            posts_urls = [item.get_attribute('href') for item in hrefs if "/p/" in item.get_attribute('href')]
+            posts_urls = list(set(posts_urls))
+
+            with open(_filename, 'w') as file:
+                for url in posts_urls:
+                    file.write(url + '\n')
+            print(f'Found {len(posts_urls)} posts')
+
+    except Exception as ex:
+        print(ex)
+        _browser.close()
+        _browser.quit()
+
+
+def get_users_by_posts(_filename, _users_filename, _browser):
+    try:
+        with open(_filename, 'r') as file:
+            posts_urls = file.read().splitlines()
+
+        users = []
+        for url in posts_urls:
+            try:
+                _browser.get(url)
+                time.sleep(10)
+                hrefs = _browser.find_elements(By.TAG_NAME, 'a')
+                all_links = [item.get_attribute('href') for item in hrefs]
+                users.append(all_links[11])
+                time.sleep(random.randrange(80, 100))
+            except Exception as ex:
+                print(ex)
+
+        with open(_users_filename, 'w') as file:
+            for user in users:
+                file.write(user + '\n')
+
+    except Exception as ex:
+        print(ex)
+        _browser.close()
+        _browser.quit()
+
+
+def main(_username, _password, geotag, posts_filename, users_filename):
+    browser = webdriver.Chrome('../chromedriver/chromedriver')
     try:
         browser.get('https://www.instagram.com')
         time.sleep(random.randrange(5, 10))
@@ -28,45 +80,14 @@ def hashtag_search(_username, _password, _geotag, _file):
         password_input.send_keys(Keys.ENTER)
         time.sleep(5)
 
-        try:
+        # get posts by geotag
+        # get_posts_by_geo(geotag, posts_filename, browser)
 
-            browser.get(
-                f'https://www.instagram.com/explore/locations/{_geotag}/')
-            time.sleep(5)
+        # get users by posts
+        get_users_by_posts(posts_filename, users_filename, browser)
 
-            while True:
-                browser.execute_script(
-                    "window.scrollTo(0, document.body.scrollHeight);")
-                time.sleep(random.randrange(3, 5))
-
-                hrefs = browser.find_elements(By.TAG_NAME, 'a')
-                posts_urls = [item.get_attribute(
-                    'href') for item in hrefs if "/p/" in item.get_attribute('href')]
-                for url in posts_urls:
-                    _file.write(url)
-                    _file.write("\n")
-
-            links = []
-            for url in posts_urls:
-                try:
-                    browser.get(url)
-                    time.sleep(10)
-                    hrefs = browser.find_elements(By.TAG_NAME, 'a')
-                    # like_button = browser.find_element(By.CLASS_NAME, "x1i10hfl xjbqb8w x6umtig x1b1mbwd xaqea5y xav7gou x9f619 x1ypdohk xt0psk2 xe8uvvx xdj266r x11i5rnm xat24cr x1mh8g0r xexx8yu x4uap5 x18d9i69 xkhd6sd x16tdsg8 x1hl2dhg xggy1nq x1a2a7pz _acan _acao _acat _acaw _aj1- _a6hd")
-                    all_links = [item.get_attribute('href') for item in hrefs]
-                    links.append(all_links[11])
-                    # time.sleep(random.randrange(80, 100))
-                except Exception as ex:
-                    print(ex)
-            print(links)
-
-            browser.close()
-            browser.quit()
-
-        except Exception as ex:
-            print(ex)
-            browser.close()
-            browser.quit()
+        browser.close()
+        browser.quit()
 
     except Exception as ex:
         print(ex)
@@ -74,6 +95,5 @@ def hashtag_search(_username, _password, _geotag, _file):
         browser.quit()
 
 
-file = open("posts.csv", "a")
-hashtag_search(username[0], password[0], '110589025635590', file)
-file.close()
+if __name__ == '__main__':
+    main(username[0], password[0], '110589025635590', 'posts.csv', 'users.txt')
