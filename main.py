@@ -1,5 +1,6 @@
 import time
 from concurrent.futures import ThreadPoolExecutor
+import random
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -101,7 +102,7 @@ def parse_by_geo(_driver: webdriver, _geotag: str, _filename_tag: str, _filename
         driver.close()
 
 
-def parse_by_file(_driver: webdriver, _file: str, _filename_tag: str, _filename_users):
+def parse_by_file(_driver: webdriver, _file: str, _filename_tag: str, _filename_users: str):
     """
     Parse posts by the file
     :param _driver: webdriver
@@ -127,14 +128,14 @@ def parse_by_file(_driver: webdriver, _file: str, _filename_tag: str, _filename_
             # delete first line in file
             with open(_file, 'w') as f:
                 f.writelines(lines[1:])
-            time.sleep(2)
+            time.sleep(random.randint(1, 2))
 
     except Exception as _ex:
         print(_ex)
         driver.close()
 
 
-def parse_username_by_tag(_driver: webdriver, _posts: list, _filename_tag: str, _filename_users):
+def parse_username_by_tag(_driver: webdriver, _posts: list, _filename_tag: str, _filename_users: str):
     """
     Opening post in new tabs and if post have need tag, parse username
     :param _driver: webdriver
@@ -147,7 +148,7 @@ def parse_username_by_tag(_driver: webdriver, _posts: list, _filename_tag: str, 
     for post in _posts:
         try:
             _driver.execute_script(f"window.open('{post}');")
-            time.sleep(15)
+            time.sleep(random.randint(3, 6))
             _driver.switch_to.window(_driver.window_handles[1])
 
             link = driver.find_elements(By.TAG_NAME, "a")
@@ -155,20 +156,22 @@ def parse_username_by_tag(_driver: webdriver, _posts: list, _filename_tag: str, 
             all_tag = []
             for tag in tags:
                 all_tag.append(tag.replace("#", ""))
-            # print(all_tag)
 
-            _username = link[10].text
-            print(_username)
+            # for i in link:
+                # print(i.get_attribute('href'))
+
+            _username = link[11].text
 
             _driver.close()
             _driver.switch_to.window(_driver.window_handles[0])
 
             accounts[_username] = all_tag
 
-            _filename_users.write(_username)
-            _filename_users.write(",")
-            _filename_users.write(",".join(all_tag))
-            _filename_users.write("\n")
+            with open(_filename_users, 'a', encoding='utf-8') as _file:
+                _file.write(_username)
+                _file.write(",")
+                _file.write(",".join(all_tag))
+                _file.write("\n")
 
         except Exception as _ex:
             print(_ex)
@@ -196,5 +199,4 @@ if __name__ == "__main__":
         parse_by_geo(driver, "110589025635590", "hashtags.csv", "users.csv")
 
     elif choice == 2:
-        with open('users.csv', 'a') as f:
-            parse_by_file(driver, "posts.csv", "hashtags.csv", f)
+        parse_by_file(driver, "posts(2).csv", "hashtags.csv", "users.csv")
