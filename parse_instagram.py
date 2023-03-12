@@ -1,5 +1,13 @@
+"""
+Parsing instagram by geotag or file with posts
+
+1. Authentication in instagram
+2. Parse posts by geotag or file with posts
+3. Parse username by tag
+"""
+
+
 import time
-from concurrent.futures import ThreadPoolExecutor
 import random
 
 from selenium import webdriver
@@ -44,7 +52,7 @@ def auth(_driver: webdriver, _username: str, _password: str):
     """
     try:
         _driver.get("https://www.instagram.com/accounts/login/")
-        time.sleep(6)
+        time.sleep(random.randint(5, 7))
 
         username_input = _driver.find_element(By.NAME, "username")
         username_input.clear()
@@ -55,7 +63,7 @@ def auth(_driver: webdriver, _username: str, _password: str):
         password_input.send_keys(_password)
 
         password_input.send_keys(Keys.RETURN)
-        time.sleep(6)
+        time.sleep(random.randint(3, 5))
 
     except Exception as _ex:
         print(_ex)
@@ -73,12 +81,12 @@ def parse_by_geo(_driver: webdriver, _geotag: str, _filename_tag: str, _filename
     """
     try:
         _driver.get(f"https://www.instagram.com/explore/locations/{_geotag}/")
-        time.sleep(6)
+        time.sleep(random.randint(6, 10))
 
         while True:
             try:
                 _driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-                time.sleep(4)
+                time.sleep(random.randint(6, 8))
 
                 hrefs = _driver.find_elements(By.XPATH, "//a[@href]")
                 hrefs = [item.get_attribute("href") for item in hrefs]
@@ -91,7 +99,6 @@ def parse_by_geo(_driver: webdriver, _geotag: str, _filename_tag: str, _filename
                 print(hrefs)
 
                 parse_username_by_tag(_driver, hrefs, _filename_tag, _filename_users)
-                time.sleep(4)
 
             except Exception as _ex:
                 print(_ex)
@@ -147,8 +154,9 @@ def parse_username_by_tag(_driver: webdriver, _posts: list, _filename_tag: str, 
     accounts = {}
     for post in _posts:
         try:
+            time.sleep(random.randint(1, 2))
             _driver.execute_script(f"window.open('{post}');")
-            time.sleep(random.randint(3, 6))
+            time.sleep(random.randint(10, 15))
             _driver.switch_to.window(_driver.window_handles[1])
 
             link = driver.find_elements(By.TAG_NAME, "a")
@@ -193,10 +201,10 @@ if __name__ == "__main__":
 
     # auth
     driver = webdriver.Chrome()
-    auth(driver, username[1], password[1])
+    auth(driver, username[2], password[2])
 
     if choice == 1:
         parse_by_geo(driver, "110589025635590", "hashtags.csv", "users.csv")
 
     elif choice == 2:
-        parse_by_file(driver, "posts(2).csv", "hashtags.csv", "users.csv")
+        parse_by_file(driver, "posts.csv", "hashtags.csv", "users.csv")
