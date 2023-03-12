@@ -10,6 +10,29 @@ from auth_data import username, password
 ALL_UNIQUE_POSTS = []
 
 
+def search_tag(tags_akk, tags):
+    for tag in tags_akk:
+        if tag in tags:
+            return True
+    return False
+
+
+def filter(akks):
+    file = open("tags.csv", "r")
+    groups = []
+    for row in file.readlines():
+        groups.append(row.replace("\n", ""))
+    file.close()
+    result = {}
+    for group in groups:
+        item = []
+        for ak in akks:
+            if search_tag(akks[ak], group):
+                item.append(ak)
+        result[group] = item
+    return result
+
+
 def auth(_driver: webdriver, _username: str, _password: str):
     """
     Authentication in instagram
@@ -78,7 +101,7 @@ def parse_by_geo(_driver: webdriver, _geotag: str, _filename_tag: str, _filename
         driver.close()
 
 
-def parse_by_file(_driver: webdriver, _file: str, _filename_tag: str, _filename_users: str):
+def parse_by_file(_driver: webdriver, _file: str, _filename_tag: str, _filename_users):
     """
     Parse posts by the file
     :param _driver: webdriver
@@ -102,16 +125,16 @@ def parse_by_file(_driver: webdriver, _file: str, _filename_tag: str, _filename_
             parse_username_by_tag(_driver, [post_url], _filename_tag, _filename_users)
 
             # delete first line in file
-            # with open(_file, 'w') as f:
-            #     f.writelines(lines[1:])
-            # time.sleep(2)
+            with open(_file, 'w') as f:
+                f.writelines(lines[1:])
+            time.sleep(2)
 
     except Exception as _ex:
         print(_ex)
         driver.close()
 
 
-def parse_username_by_tag(_driver: webdriver, _posts: list, _filename_tag: str, _filename_users: str):
+def parse_username_by_tag(_driver: webdriver, _posts: list, _filename_tag: str, _filename_users):
     """
     Opening post in new tabs and if post have need tag, parse username
     :param _driver: webdriver
@@ -120,11 +143,11 @@ def parse_username_by_tag(_driver: webdriver, _posts: list, _filename_tag: str, 
     :param _filename_users: name of file to write users
     :return: None
     """
-    try:
-        for post in _posts:
-            print(post)
+    accounts = {}
+    for post in _posts:
+        try:
             _driver.execute_script(f"window.open('{post}');")
-            time.sleep(2)
+            time.sleep(15)
             _driver.switch_to.window(_driver.window_handles[1])
 
             link = driver.find_elements(By.TAG_NAME, "a")
@@ -132,21 +155,24 @@ def parse_username_by_tag(_driver: webdriver, _posts: list, _filename_tag: str, 
             all_tag = []
             for tag in tags:
                 all_tag.append(tag.replace("#", ""))
-            print(all_tag)
+            # print(all_tag)
 
-            if len(tags) == 0:
-                _driver.close()
-                _driver.switch_to.window(_driver.window_handles[0])
-                continue
-
-            print
+            _username = link[10].text
+            print(_username)
 
             _driver.close()
             _driver.switch_to.window(_driver.window_handles[0])
 
-    except Exception as _ex:
-        print(_ex)
-        driver.close()
+            accounts[_username] = all_tag
+
+            _filename_users.write(_username)
+            _filename_users.write(",")
+            _filename_users.write(",".join(all_tag))
+            _filename_users.write("\n")
+
+        except Exception as _ex:
+            print(_ex)
+            driver.close()
 
 
 if __name__ == "__main__":
@@ -164,10 +190,11 @@ if __name__ == "__main__":
 
     # auth
     driver = webdriver.Chrome()
-    auth(driver, username[0], password[0])
+    auth(driver, username[1], password[1])
 
     if choice == 1:
         parse_by_geo(driver, "110589025635590", "hashtags.csv", "users.csv")
 
     elif choice == 2:
-        parse_by_file(driver, "posts.csv", "hashtags.csv", "users.csv")
+        with open('users.csv', 'a') as f:
+            parse_by_file(driver, "posts.csv", "hashtags.csv", f)
