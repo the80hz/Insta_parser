@@ -89,43 +89,25 @@ def parse_by_file(_driver: webdriver, _file: str, _filename_tag: str, _filename_
     """
     try:
         while True:
-            # read first line
-            with open('posts.csv', 'r') as f:
+            # read lines in file
+            with open(_file, 'r') as f:
                 lines = f.readlines()
-            # make lines to list
-            lines = [line.replace("\n", "") for line in lines]
-            # parse posts
-            parse_username_by_tag(_driver, lines, _filename_tag, _filename_users)
 
-            # delete the first line
-            # with open('posts.csv', 'w') as f:
+            # get the post url
+            post_url = lines[0].strip()
+            print(post_url)
+
+            # parse username by tag
+            parse_username_by_tag(_driver, [post_url], _filename_tag, _filename_users)
+
+            # delete first line in file
+            # with open(_file, 'w') as f:
             #     f.writelines(lines[1:])
-            time.sleep(2)
+            # time.sleep(2)
 
     except Exception as _ex:
         print(_ex)
         driver.close()
-
-
-def _filter(akks):
-    """
-    Filter accounts by tags
-    :param akks: filename with tags
-    :return: dict of accounts
-    """
-    file = open("tags.csv", "r")
-    groups = []
-    for row in file.readlines():
-        groups.append(row.replace("\n", ""))
-    file.close()
-    result = {}
-    for group in groups:
-        item = []
-        for ak in akks:
-            if search_tag(akks[ak], group):
-                item.append(ak)
-        result[group] = item
-    return result
 
 
 def parse_username_by_tag(_driver: webdriver, _posts: list, _filename_tag: str, _filename_users: str):
@@ -170,7 +152,6 @@ def parse_username_by_tag(_driver: webdriver, _posts: list, _filename_tag: str, 
 
 
 if __name__ == "__main__":
-
     while True:
         try:
             choice = int(input("1 - Parse new posts \n2 - Parse from file\n"))
@@ -188,7 +169,7 @@ if __name__ == "__main__":
     auth(driver, username[0], password[0])
 
     if choice == 1:
-        parse_by_geo(driver, "110589025635590", "tags.csv", "users.csv")
+        parse_by_geo(driver, "110589025635590", "hashtags.csv", "users.csv")
 
     elif choice == 2:
-        parse_by_file(driver, "posts.csv", "tags.csv", "users.csv")
+        parse_by_file(driver, "posts.csv", "hashtags.csv", "users.csv")
