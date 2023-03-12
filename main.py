@@ -95,6 +95,7 @@ def parse_by_file(_driver: webdriver, _file: str, _filename_tag: str, _filename_
 
             # get the post url
             post_url = lines[0].strip()
+            post_url = post_url.replace('\n', '')
             print(post_url)
 
             # parse username by tag
@@ -123,7 +124,7 @@ def parse_username_by_tag(_driver: webdriver, _posts: list, _filename_tag: str, 
         for post in _posts:
             print(post)
             _driver.execute_script(f"window.open('{post}');")
-            time.sleep(4)
+            time.sleep(2)
             _driver.switch_to.window(_driver.window_handles[1])
 
             link = driver.find_elements(By.TAG_NAME, "a")
@@ -138,10 +139,7 @@ def parse_username_by_tag(_driver: webdriver, _posts: list, _filename_tag: str, 
                 _driver.switch_to.window(_driver.window_handles[0])
                 continue
 
-            tags = [item.text for item in tags]
-
-            # check tags
-
+            print
 
             _driver.close()
             _driver.switch_to.window(_driver.window_handles[0])
