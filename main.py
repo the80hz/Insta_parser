@@ -66,7 +66,7 @@ def parse_by_geo(_driver: webdriver, _geotag: str, _filename_tag: str, _filename
                 print(f"Posts: {len(hrefs)}")
                 print(hrefs)
 
-                parse_username(_driver, hrefs, _filename_tag, _filename_users)
+                parse_username_by_tag(_driver, hrefs, _filename_tag, _filename_users)
                 time.sleep(4)
 
             except Exception as _ex:
@@ -78,66 +78,91 @@ def parse_by_geo(_driver: webdriver, _geotag: str, _filename_tag: str, _filename
         driver.close()
 
 
-def parse_by_file(_driver: webdriver, _file: str):
+def parse_by_file(_driver: webdriver, _file: str, _filename_tag: str, _filename_users: str):
     """
     Parse posts by the file
     :param _driver: webdriver
     :param _file: file
-    :return: None
-    """
-    pass
-
-
-def parse_username(_driver: webdriver, _post_list: list, _filename_tag: str, _filename_users: str):
-    """
-    Opening posts in new tabs and parse username by need tag
-    :param _driver: webdriver
-    :param _post_list: list of posts
     :param _filename_tag: name of file with need tags
     :param _filename_users: name of file to write users
     :return: None
     """
     try:
-        with ThreadPoolExecutor(max_workers=5) as executor:
-            for post in _post_list:
-                executor.submit(parse_username_by_tag, _driver, post, _filename_tag)
+        while True:
+            # read first line
+            with open('posts.csv', 'r') as f:
+                lines = f.readlines()
+            # make lines to list
+            lines = [line.replace("\n", "") for line in lines]
+            # parse posts
+            parse_username_by_tag(_driver, lines, _filename_tag, _filename_users)
+
+            # delete the first line
+            # with open('posts.csv', 'w') as f:
+            #     f.writelines(lines[1:])
+            time.sleep(2)
 
     except Exception as _ex:
         print(_ex)
         driver.close()
 
 
-def parse_username_by_tag(_driver: webdriver, _post: str, _filename_tag: str, _filename_users: str):
+def _filter(akks):
+    """
+    Filter accounts by tags
+    :param akks: filename with tags
+    :return: dict of accounts
+    """
+    file = open("tags.csv", "r")
+    groups = []
+    for row in file.readlines():
+        groups.append(row.replace("\n", ""))
+    file.close()
+    result = {}
+    for group in groups:
+        item = []
+        for ak in akks:
+            if search_tag(akks[ak], group):
+                item.append(ak)
+        result[group] = item
+    return result
+
+
+def parse_username_by_tag(_driver: webdriver, _posts: list, _filename_tag: str, _filename_users: str):
     """
     Opening post in new tabs and if post have need tag, parse username
     :param _driver: webdriver
-    :param _post: post url
+    :param _posts: list of posts or one post with url
     :param _filename_tag: name of file with need tags
     :param _filename_users: name of file to write users
     :return: None
     """
     try:
-        _driver.execute_script(f"window.open('{_post}');")
-        time.sleep(4)
-        _driver.switch_to.window(_driver.window_handles[1])
+        for post in _posts:
+            print(post)
+            _driver.execute_script(f"window.open('{post}');")
+            time.sleep(4)
+            _driver.switch_to.window(_driver.window_handles[1])
 
-        # get username
-        username = _driver.find_element(By.XPATH, "//a[@class='FPmhX notranslate  _0imsa ']").text
+            link = driver.find_elements(By.TAG_NAME, "a")
+            tags = [item.text for item in link if "/tags/" in item.get_attribute('href')]
+            all_tag = []
+            for tag in tags:
+                all_tag.append(tag.replace("#", ""))
+            print(all_tag)
 
-        # get tags
-        tags = _driver.find_elements(By.XPATH, "//a[@class='xil3i']")
-        tags = [item.text for item in tags]
+            if len(tags) == 0:
+                _driver.close()
+                _driver.switch_to.window(_driver.window_handles[0])
+                continue
 
-        # check tags
-        with open(_filename_tag, "r") as file:
-            need_tags = file.read().split("\n")
+            tags = [item.text for item in tags]
 
-        if len(set(tags) & set(need_tags)) > 0:
-            with open(_filename_users, "a") as file:
-                file.write(f"{username}\n")
+            # check tags
 
-        _driver.close()
-        _driver.switch_to.window(_driver.window_handles[0])
+
+            _driver.close()
+            _driver.switch_to.window(_driver.window_handles[0])
 
     except Exception as _ex:
         print(_ex)
@@ -145,6 +170,7 @@ def parse_username_by_tag(_driver: webdriver, _post: str, _filename_tag: str, _f
 
 
 if __name__ == "__main__":
+
     while True:
         try:
             choice = int(input("1 - Parse new posts \n2 - Parse from file\n"))
@@ -165,4 +191,4 @@ if __name__ == "__main__":
         parse_by_geo(driver, "110589025635590", "tags.csv", "users.csv")
 
     elif choice == 2:
-        parse_by_file(driver, "posts.csv")
+        parse_by_file(driver, "posts.csv", "tags.csv", "users.csv")
