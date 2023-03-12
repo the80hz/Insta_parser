@@ -8,92 +8,38 @@ from selenium.webdriver.common.by import By
 from auth_data import username, password
 
 
-def get_posts_by_geo(_geotag, _filename, _browser):
-    try:
-        _browser.get(
-            f'https://www.instagram.com/explore/locations/{_geotag}/')
-        time.sleep(5)
+def auth(driver, _username, _password):
+    # Авторизация
+    driver.get("https://www.instagram.com/accounts/login/")
+    time.sleep(random.randrange(2, 4))
 
-        while True:
-            _browser.execute_script(
-                "window.scrollTo(0, document.body.scrollHeight);")
-            time.sleep(random.randrange(3, 5))
+    username_input = driver.find_element(By.NAME, "username")
+    username_input.clear()
+    username_input.send_keys(_username)
 
-            hrefs = _browser.find_elements(By.TAG_NAME, 'a')
-            posts_urls = [item.get_attribute('href') for item in hrefs if "/p/" in item.get_attribute('href')]
-            posts_urls = list(set(posts_urls))
+    password_input = driver.find_element(By.NAME, "password")
+    password_input.clear()
+    password_input.send_keys(_password)
 
-            with open(_filename, 'w') as file:
-                for url in posts_urls:
-                    file.write(url + '\n')
-            print(f'Found {len(posts_urls)} posts')
+    password_input.send_keys(Keys.RETURN)
 
-    except Exception as ex:
-        print(ex)
-        _browser.close()
-        _browser.quit()
+    time.sleep(random.randrange(2, 4))
 
 
-def get_users_by_posts(_filename, _users_filename, _browser):
-    try:
-        with open(_filename, 'r') as file:
-            posts_urls = file.read().splitlines()
+if __name__ == "__main__":
+    # что вы хотите сделать 1 - спарсить новые посты, 2 - спарсить посты из файла
+    while True:
+        try:
+            choice = int(input("Что вы хотите сделать? \n1 - спарсить новые посты \n2 - спарсить посты из файла: \n"))
+            if choice == 1:
+                break
+            elif choice == 2:
+                break
+            else:
+                print("Неверный ввод")
+        except Exception as ex:
+            print(ex)
 
-        users = []
-        for url in posts_urls:
-            try:
-                _browser.get(url)
-                time.sleep(10)
-                hrefs = _browser.find_elements(By.TAG_NAME, 'a')
-                all_links = [item.get_attribute('href') for item in hrefs]
-                users.append(all_links[11])
-                time.sleep(random.randrange(80, 100))
-            except Exception as ex:
-                print(ex)
-
-        with open(_users_filename, 'w') as file:
-            for user in users:
-                file.write(user + '\n')
-
-    except Exception as ex:
-        print(ex)
-        _browser.close()
-        _browser.quit()
-
-
-def main(_username, _password, geotag, posts_filename, users_filename):
-    browser = webdriver.Chrome('../chromedriver/chromedriver')
-    try:
-        browser.get('https://www.instagram.com')
-        time.sleep(random.randrange(5, 10))
-
-        username_input = browser.find_element(By.NAME, "username")
-        username_input.clear()
-        username_input.send_keys(_username)
-
-        time.sleep(2)
-
-        password_input = browser.find_element(By.NAME, "password")
-        password_input.clear()
-        password_input.send_keys(_password)
-
-        password_input.send_keys(Keys.ENTER)
-        time.sleep(5)
-
-        # get posts by geotag
-        # get_posts_by_geo(geotag, posts_filename, browser)
-
-        # get users by posts
-        get_users_by_posts(posts_filename, users_filename, browser)
-
-        browser.close()
-        browser.quit()
-
-    except Exception as ex:
-        print(ex)
-        browser.close()
-        browser.quit()
-
-
-if __name__ == '__main__':
-    main(username[0], password[0], '110589025635590', 'posts.csv', 'users.txt')
+    # auth
+    driver = webdriver.Chrome()
+    auth(driver, username[0], password[0])
