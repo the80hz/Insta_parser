@@ -7,6 +7,8 @@ from selenium.webdriver.common.by import By
 
 from auth_data import username, password
 
+ALL_UNIQUE_POSTS = []
+
 
 def auth(_driver: webdriver, _username: str, _password: str):
     """
@@ -55,6 +57,8 @@ def parse_by_geo(_driver: webdriver, _geotag: str):
                 hrefs = [item.get_attribute("href") for item in hrefs]
                 hrefs = [item for item in hrefs if "/p/" in item]
                 hrefs = list(set(hrefs))
+                hrefs = [item for item in hrefs if item not in ALL_UNIQUE_POSTS]
+                ALL_UNIQUE_POSTS.extend(hrefs)
                 print(f"Posts: {len(hrefs)}")
                 print(hrefs)
                 parse_username(_driver, hrefs, "tags.csv")
