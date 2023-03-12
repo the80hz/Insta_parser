@@ -105,7 +105,7 @@ if __name__ == "__main__":
     auth(driver, username[0], password[0])
 
     if choice == 1:
-        parse_by_geo(driver, "Prague")
+        parse_by_geo(driver, "110589025635590")
 
     elif choice == 2:
         parse_by_file(driver, "posts.csv")
