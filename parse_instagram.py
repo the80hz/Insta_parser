@@ -109,11 +109,11 @@ def parse_by_geo(_driver: webdriver, _geotag: str, _filename_tag: str, _filename
         driver.close()
 
 
-def parse_by_file(_driver: webdriver, _file: str, _filename_tag: str, _filename_users: str):
+def parse_by_file(_driver: webdriver, _filename_posts: str, _filename_tag: str, _filename_users: str):
     """
     Parse posts by the file
     :param _driver: webdriver
-    :param _file: file
+    :param _filename_posts: file
     :param _filename_tag: name of file with need tags
     :param _filename_users: name of file to write users
     :return: None
@@ -121,7 +121,7 @@ def parse_by_file(_driver: webdriver, _file: str, _filename_tag: str, _filename_
     try:
         while True:
             # read lines in file
-            with open(_file, 'r') as f:
+            with open(_filename_posts, 'r') as f:
                 lines = f.readlines()
 
             # get the post url
@@ -133,7 +133,7 @@ def parse_by_file(_driver: webdriver, _file: str, _filename_tag: str, _filename_
             parse_username_by_tag(_driver, [post_url], _filename_tag, _filename_users)
 
             # delete first line in file
-            with open(_file, 'w') as f:
+            with open(_filename_posts, 'w') as f:
                 f.writelines(lines[1:])
             time.sleep(random.randint(1, 2))
 
