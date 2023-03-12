@@ -38,7 +38,7 @@ def auth(_driver: webdriver, _username: str, _password: str):
 
 def parse_by_geo(_driver: webdriver, _geotag: str):
     """
-    Parse posts by geotag and open them in new tabs, then parse username
+    Parse posts by geotag and open them in new tabs, then parse username by parse_username function
     :param _driver: webdriver
     :param _geotag: geotag
     :return: None
@@ -56,6 +56,9 @@ def parse_by_geo(_driver: webdriver, _geotag: str):
                 hrefs = [item for item in hrefs if "/p/" in item]
                 hrefs = list(set(hrefs))
                 print(f"Posts: {len(hrefs)}")
+                print(hrefs)
+                parse_username(_driver, hrefs, "tags.csv")
+                time.sleep(4)
 
             except Exception as _ex:
                 print(_ex)
@@ -76,11 +79,11 @@ def parse_by_file(_driver: webdriver, _file: str):
     pass
 
 
-def parse_username(_driver: webdriver, _post_url: str, _filename_tag: str):
+def parse_username(_driver: webdriver, _post_list: list, _filename_tag: str):
     """
     Parse username by
     :param _driver: webdriver
-    :param _post_url: post url
+    :param _post_list: list of posts
     :param _filename_tag: name of file with need tags
     :return: None
     """
