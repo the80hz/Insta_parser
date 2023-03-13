@@ -4,5 +4,5 @@
 /build/
 /temp/*
 
-users.txt
-posts.csv
+google_csv/
+instagrapi_csv/

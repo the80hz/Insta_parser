@@ -1,5 +1,6 @@
 from instagrapi import Client
 from datetime import datetime
+import csv
 
 import auth_data
 
@@ -50,10 +51,11 @@ def get_postinfo(post_filename, info_filename):
     """
     Get post info from url in every line in file
     :param post_filename:
+
     :return:
     """
     client = Client()
-    client.login(auth_data.username[1], auth_data.password[1])
+    client.login(auth_data.username[0], auth_data.password[0])
 
     while True:
         # read lines in file
@@ -76,19 +78,14 @@ def get_postinfo(post_filename, info_filename):
         except Exception as e:
             if 'Media not found or unavailable' in str(e):
                 print('Media not found or unavailable')
-                with open('posts.csv', 'w') as f:
+                with open(post_filename, 'w') as f:
                     for line in lines[1:]:
                         f.write(line)
-                return
             else:
                 raise e
 
-        # write the str(user) to a file
-        with open('posts.csv', 'a', encoding='utf8') as w:
-            w.write(str(post) + '\n')
-
         # delete the first line in the file
-        with open('posts.csv', 'w', encoding='utf8') as f:
+        with open(post_filename, 'w', encoding='utf8') as f:
             for line in lines[1:]:
                 f.write(line)
 
@@ -99,4 +96,4 @@ def get_postinfo(post_filename, info_filename):
 
 if __name__ == '__main__':
     start = datetime.now().timestamp()
-    get_postinfo('posts.csv', 'info.csv')
+    get_postinfo('instagrapi_csv/posts.csv', 'instagrapi_csv/info.csv')
