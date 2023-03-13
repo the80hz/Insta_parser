@@ -1,2 +1,6 @@
-username = ['melaniehenderson671wwg', 'dubovaksenia13@gmail.com', 'sarahjohnston460a01', 'andreamacleod640yz4']
-password = ['FtsNFUgC', 'ParS1234567', 'aTJVf1nR', 'hE4N7r0y']
+username = ['michelleslater83pd1', 'donnamackenzie19pja',
+             'andreamacleod640yz4', 'melaniehenderson671wwg',
+             '', '']
+password = ['pass123pass', 'fcyYEev3',
+             'hE4N7r0y', 'FtsNFUgC',
+             '', '']

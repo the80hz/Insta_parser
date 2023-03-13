@@ -1,6 +1,7 @@
-from instagrapi import Client
 from datetime import datetime
-import csv
+import re
+
+from instagrapi import Client
 
 import auth_data
 
@@ -34,7 +35,7 @@ def get_userid():
                 raise e
 
         # write the str(user) to a file
-        with open('users.csv', 'a') as w:
+        with open('users.csv.csv', 'a') as w:
             w.write(str(user) + '\n')
 
         # delete the first line in the file
@@ -51,7 +52,7 @@ def get_postinfo(post_filename, info_filename):
     """
     Get post info from url in every line in file
     :param post_filename:
-
+    :param info_filename:
     :return:
     """
     client = Client()
@@ -94,6 +95,38 @@ def get_postinfo(post_filename, info_filename):
         print(f'{round(end - start, 2)} sec')
 
 
+def get_userinfo(users_filename, info_filename):
+    client = Client()
+    client.login(auth_data.username[2], auth_data.password[2])
+
+    while True:
+        # read lines in file
+        with open(users_filename, 'r', encoding='utf8') as f:
+            lines = f.readlines()
+
+        # get the username from the first line
+        username = lines[0].strip()
+        username = re.findall('https://www.instagram.com/(.*)/', username)[0]
+        print(username)
+        # get the user info
+        try:
+            userinfo = client.user_info_by_username(username)
+            # write str(userinfo) to a file
+            with open(info_filename, 'a', encoding='utf8') as w:
+                w.write(str(userinfo) + '\n')
+
+        except Exception as e:
+            print(e)
+            with open(users_filename, 'w') as f:
+                for line in lines[1:]:
+                    f.write(line)
+
+        # delete the first line in the file
+        with open(users_filename, 'w', encoding='utf8') as f:
+            for line in lines[1:]:
+                f.write(line)
+
+
 if __name__ == '__main__':
     start = datetime.now().timestamp()
-    get_postinfo('instagrapi_csv/posts.csv', 'instagrapi_csv/info.csv')
+    get_userinfo('users.csv', 'info_userid.csv')
