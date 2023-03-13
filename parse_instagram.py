@@ -201,7 +201,7 @@ if __name__ == "__main__":
 
     # auth
     driver = webdriver.Chrome()
-    auth(driver, username[2], password[2])
+    auth(driver, username[0], password[0])
 
     if choice == 1:
         parse_by_geo(driver, "110589025635590", "hashtags.csv", "users.csv")
