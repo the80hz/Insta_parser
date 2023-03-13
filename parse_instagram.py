@@ -204,7 +204,7 @@ if __name__ == "__main__":
     auth(driver, username[0], password[0])
 
     if choice == 1:
-        parse_by_geo(driver, "110589025635590", "hashtags.csv", "users.csv")
+        parse_by_geo(driver, "110589025635590", "instagrapi_csv/hashtags.csv", "instagrapi_csv/users.csv")
 
     elif choice == 2:
-        parse_by_file(driver, "posts.csv", "hashtags.csv", "users.csv")
+        parse_by_file(driver, "instagrapi_csv/posts.csv", "instagrapi_csv/hashtags.csv", "instagrapi_csv/users.csv")

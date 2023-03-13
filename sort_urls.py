@@ -44,6 +44,6 @@ def unique(_input: str):
 
 
 if __name__ == "__main__":
-    make_url("posts_g.csv", "posts_g2s.csv")
-    unique("posts_g2s.csv")
+    make_url("google_csv/posts_g.csv", "google_csv/posts_g2s.csv")
+    unique("google_csv/posts_g2s.csv")
 

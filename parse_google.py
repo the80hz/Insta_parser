@@ -42,16 +42,17 @@ def search_google(_driver: webdriver, _filename_posts: str,  _tag1: str, _tag2: 
 
 if __name__ == "__main__":
     tag1 = "prague"
-    with open("tags.csv", "r", encoding='utf-8') as file:
+    with open('google_csv/tags.csv', "r", encoding='utf-8') as file:
         reader = csv.reader(file)
         for row in reader:
             for tag2 in row:
+                print(tag2)
                 options = Options()
                 ua = UserAgent()
                 userAgent = ua.random
                 print(userAgent)
                 options.add_argument(f'user-agent={userAgent}')
                 driver = webdriver.Chrome(options=options)
-                search_google(driver, "posts_g.csv", tag1, tag2)
+                search_google(driver, "google_csv/posts_g.csv", tag1, tag2)
 
     driver.close()

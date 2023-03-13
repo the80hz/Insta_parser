@@ -5,7 +5,5 @@
 /__pycache__/
 /temp/
 
-posts.*
-users.*
-tags.csv
-hashtags.csv
+/google_csv/
+/instagrapi_csv/
