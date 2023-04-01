@@ -97,7 +97,7 @@ def get_postinfo(post_filename, info_filename):
 
 def get_userinfo(users_filename, info_filename):
     client = Client()
-    client.login(auth_data.username[2], auth_data.password[2])
+    client.login(auth_data.username[0], auth_data.password[0])
 
     while True:
         # read lines in file
@@ -106,7 +106,7 @@ def get_userinfo(users_filename, info_filename):
 
         # get the username from the first line
         username = lines[0].strip()
-        username = re.findall('https://www.instagram.com/(.*)/', username)[0]
+        #username = re.findall('https://www.instagram.com/(.*)/', username)[0]
         print(username)
         # get the user info
         try:
@@ -129,4 +129,4 @@ def get_userinfo(users_filename, info_filename):
 
 if __name__ == '__main__':
     start = datetime.now().timestamp()
-    get_userinfo('users.csv', 'info_userid.csv')
+    get_userinfo('usernames.csv', 'info_userid.csv')

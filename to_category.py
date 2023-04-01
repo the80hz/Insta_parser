@@ -52,8 +52,8 @@ def category(_input, _output):
                'bodybuilding', 'fitnessmotivation', 'спортзал', 'coach', 'тренажерныйзал', 'training', 'sportlife',
                'fitnessgirl', 'sportgirl']
 
-    database = pd.DataFrame(columns=['userid', 'cosmetic', 'epilation', 'brows_and_lashes', 'makeup', 'tattoo', 'haircut',
-                                     'nails', 'massage', 'stylist', 'psychology', 'medicine', 'fitness'])
+    database = pd.DataFrame(columns=['userid', 'cosmetic', 'epilation', 'brows_and_lashes', 'makeup', 'tattoo',
+                                     'haircut', 'nails', 'massage', 'stylist', 'psychology', 'medicine', 'fitness'])
 
     with open(_input, "r", encoding='utf-8') as file:
         reader = csv.reader(file)

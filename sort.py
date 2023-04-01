@@ -110,9 +110,6 @@ def pack_to_csv_users(input_f, output_f):
                 _file.write('\n')
 
 
-
-
-
 def find_prague(input_f, output_f):
     """
     find lines with prague or прага words
@@ -128,6 +125,18 @@ def find_prague(input_f, output_f):
     print(count)
 
 
+def find_username(input_f, output_f):
+    with open(input_f, 'r', encoding='utf-8') as _file:
+        lines = _file.readlines()
+    for line in lines:
+        username = re.search(r"username='(.+?)'", line)
+        if username:
+            username = username.group(1)
+        with open(output_f, 'a', encoding='utf-8') as __file:
+            __file.write(username)
+            __file.write('\n')
+
+
 if __name__ == '__main__':
     # make_url("google_csv/posts_g.csv", "google_csv/posts_g2s.csv")
 
@@ -136,4 +145,6 @@ if __name__ == '__main__':
     # pack_to_csv_posts('google_csv/info.csv', 'instagrapi_csv/packed.csv')
     # pack_to_csv_users('info_userid.csv', 'instagrapi_csv/packed.csv')
 
-    find_prague('instagrapi_csv/packed.csv', 'instagrapi_csv/right.csv')
+    # find_prague('instagrapi_csv/packed.csv', 'instagrapi_csv/right.csv')
+
+    find_username('parsed_posts.csv', 'usernames.csv')
