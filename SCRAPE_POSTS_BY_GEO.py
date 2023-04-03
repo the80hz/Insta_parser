@@ -47,12 +47,12 @@ def auth(_driver: webdriver, _username: str, _password: str):
         _driver.close()
 
 
-def parse_by_geo(_driver: webdriver, _geotag: str, _filename_tag: str):
+def parse_by_geo(_driver: webdriver, _geotag: str, _output: str):
     """
     Parse posts by a geotag
     :param _driver: webdriver
     :param _geotag: geotag
-    :param _filename_tag: name of file with need tags
+    :param _output: name of file with need tags
     :return: None
     """
     try:
@@ -69,7 +69,7 @@ def parse_by_geo(_driver: webdriver, _geotag: str, _filename_tag: str):
                 hrefs = [item for item in hrefs if "/p/" in item]
                 hrefs = list(set(hrefs))
                 hrefs = [item for item in hrefs if item not in ALL_UNIQUE_POSTS]
-                with open(_filename_tag, "a", encoding='utf-8') as _file:
+                with open(_output, "a", encoding='utf-8') as _file:
                     _file.write("\n".join(hrefs) + "\n")
                 ALL_UNIQUE_POSTS.extend(hrefs)
                 print(f"Sum: {len(ALL_UNIQUE_POSTS)}")
