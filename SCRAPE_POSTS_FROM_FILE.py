@@ -13,7 +13,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from fake_useragent import UserAgent
 
 
-def parse_from_post_link(_driver: webdriver, _input: str, _output: str):
+def parse_post_selenium(_driver: webdriver, _input: str, _output: str):
     """
     Parse all info from post, open user page and get all info about user
     :param _driver: webdriver
@@ -107,7 +107,7 @@ def main():
 
         driver = webdriver.Chrome(options=options)
 
-        parse_from_post_link(driver, '110589025635590.csv', 'users_info.csv')
+        parse_post_selenium(driver, '110589025635590.csv', 'users_info.csv')
 
     except Exception as _ex:
         print(_ex)

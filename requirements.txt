@@ -1,2 +1,3 @@
 selenium
 fake_useragent
+Pillow>=8.1.1
