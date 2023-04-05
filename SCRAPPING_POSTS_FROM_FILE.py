@@ -80,7 +80,9 @@ def parse_from_post_link(_driver: webdriver, _input: str, _output: str):
                 writer = csv.writer(f)
                 writer.writerow([username, location, description])
 
-            time.sleep(random.randint(2, 4))
+            print(username)
+
+            time.sleep(random.randint(1, 2))
 
             # delete first line in file
             with open(_input, 'w', encoding='utf-8') as f:
@@ -98,13 +100,14 @@ def main():
     """
     try:
         options = webdriver.ChromeOptions()
-        """ua = UserAgent()
+        ua = UserAgent()
         user_agent = ua.random
-        print(user_agent)"""
+        print(user_agent)
+        options.add_argument(f'user-agent={user_agent}')
 
         driver = webdriver.Chrome(options=options)
 
-        parse_from_post_link(driver, '1953015018347533.csv', 'users_info.csv')
+        parse_from_post_link(driver, '110589025635590.csv', 'users_info.csv')
 
     except Exception as _ex:
         print(_ex)
