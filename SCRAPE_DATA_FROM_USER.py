@@ -13,6 +13,8 @@ from selenium.webdriver.support import expected_conditions as EC
 from fake_useragent import UserAgent
 import instagrapi
 
+from auth_data import acc1 as account
+
 
 def parse_user_selenium(_driver: webdriver, _input: str, _output: str):
     """
@@ -116,11 +118,13 @@ def parse_user_api(_input: str, _output: str):
 
             print(user_url)
             cl = instagrapi.Client()
-
-            user = cl.user_info_by_username(user_url)
+            cl.login(account[0], account[1])
+            user = cl.user_info_by_username(user_url).dict()
             with open(_output, 'a', encoding='utf-8', newline='') as f:
                 writer = csv.writer(f)
-                writer.writerow([user.username, user.account_type, user.biography, user.follower_count, user.following_count, user.address_street, user.business_category_name, user.business_contact_method, user.category, user.category_name, user.city_id, user.city_name, user.contact_phone_number, user.external_url, user.instagram_location_id, user.is_business, user.is_verified, user.media_count, user.public_email, user.public_phone_country_code, user.public_phone_number, user.zip, ])
+                # write all user values to csv file
+                for key, value in user.items():
+                    writer.writerow([key, value])
             time.sleep(2)
 
             # delete first line in file
