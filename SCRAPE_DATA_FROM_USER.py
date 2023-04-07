@@ -7,90 +7,118 @@ import random
 import csv
 
 from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from fake_useragent import UserAgent
 import instagrapi
 
-from auth_data import acc1 as account
+from auth_data import acc3 as account
+
+
+def auth(_driver: webdriver, _username: str, _password: str):
+    """
+    Authentication in instagram
+    :param _driver: webdriver
+    :param _username: username
+    :param _password: password
+    :return: None
+    """
+    try:
+        _driver.get("https://www.instagram.com/accounts/login/")
+
+        time.sleep(random.randint(5, 7))
+
+        username_input = _driver.find_element(By.NAME, "username")
+        username_input.clear()
+        username_input.send_keys(_username)
+
+        time.sleep(random.randint(1, 2))
+
+        password_input = _driver.find_element(By.NAME, "password")
+        password_input.clear()
+        password_input.send_keys(_password)
+
+        password_input.send_keys(Keys.RETURN)
+
+        time.sleep(random.randint(3, 5))
+
+    except Exception as _ex:
+        print(_ex)
+        _driver.close()
 
 
 def parse_user_selenium(_driver: webdriver, _input: str, _output: str):
     """
     Parse all info from user
     :param _driver: webdriver
-    :param _input: file with post links
-    :param _output: file with all info about users
+    :param _input: csv file with post links
+    :param _output: csv file with all info about users
     :return: None
     """
     try:
-        while True:
-            # read lines in file
-            with open(_input, 'r', encoding='utf-8') as f:
-                lines = f.readlines()
+        with open(_input, 'r', encoding='utf-8') as f:
+            count = 0
+            lines = csv.reader(f)
+            for line in lines:
+                username = line[0]
+                user_url = 'https://www.instagram.com/' + username + '/'
+                _driver.get(f"{user_url}")
 
-            # get the user url
-            user_url = lines[0].strip()
-            user_url = user_url.replace('\n', '')
-            user_url = 'https://www.instagram.com/' + user_url + '/'
-            print(user_url)
+                # get fullname
+                try:
+                    fullname = WebDriverWait(_driver, 5).until(
+                        EC.presence_of_element_located((By.CSS_SELECTOR,
+                                                        'span._aacl._aaco._aacw._aacx._aad7._aade'))
+                    )
+                    fullname = fullname.text
+                except Exception as _ex:
+                    fullname = ''
 
-            _driver.get(f"{user_url}")
+                # get category
+                try:
+                    category = WebDriverWait(_driver, 5).until(
+                        EC.presence_of_element_located((By.CSS_SELECTOR,
+                                                        'div._aacl._aaco._aacu._aacy._aad6._aade'))
+                    )
+                    category = category.text
+                except Exception as _ex:
+                    category = ''
 
-            # get location
-            try:
-                location = WebDriverWait(_driver, 5).until(
-                    EC.presence_of_element_located((By.CSS_SELECTOR,
-                                                    'a.x1i10hfl.xjbqb8w.x6umtig.x1b1mbwd.xaqea5y.xav7gou.x9f619'
-                                                    '.x1ypdohk.xt0psk2.xe8uvvx.xdj266r.x11i5rnm.xat24cr.x1mh8g0r'
-                                                    '.xexx8yu.x4uap5.x18d9i69.xkhd6sd.x16tdsg8.x1hl2dhg.xggy1nq'
-                                                    '.x1a2a7pz._aaqk._a6hd'))
-                )
-                location = location.text
-            except Exception as _ex:
-                location = ''
+                # get bio
+                try:
+                    bio = WebDriverWait(_driver, 5).until(
+                        EC.presence_of_element_located((By.CSS_SELECTOR,
+                                                        'h1._aacl._aaco._aacu._aacx._aad6._aade'))
+                    )
+                    bio = bio.text
+                except Exception as _ex:
+                    bio = ''
 
-            # get username
-            try:
-                username = WebDriverWait(_driver, 5).until(
-                    EC.presence_of_element_located((By.CSS_SELECTOR,
-                                                    "a.x1i10hfl.xjqpnuy.xa49m3k.xqeqjp1.x2hbi6w.xdl72j9.x2lah0s"
-                                                    ".xe8uvvx.xdj266r.x11i5rnm.xat24cr.x1mh8g0r.x2lwn1j.xeuugli"
-                                                    ".x1hl2dhg.xggy1nq.x1ja2u2z.x1t137rt.x1q0g3np.x1lku1pv.x1a2a7pz"
-                                                    ".x6s0dn4.xjyslct.x1ejq31n.xd10rxx.x1sy0etr.x17r0tee.x9f619"
-                                                    ".x1ypdohk.x1i0vuye.xwhw2v2.xl56j7k.x17ydfre.x1f6kntn.x2b8uid"
-                                                    ".xlyipyv.x87ps6o.x14atkfc.x1d5wrs8.x972fbf.xcfux6l.x1qhh985"
-                                                    ".xm0m39n.xm3z3ea.x1x8b98j.x131883w.x16mih1h.xt7dq6l.xexx8yu"
-                                                    ".x4uap5.x18d9i69.xkhd6sd.x1n2onr6.xjbqb8w.x1n5bzlp.xqnirrm"
-                                                    ".xj34u2y.x568u83.x3nfvp2"))
-                )
-                username = username.text
-            except Exception as _ex:
-                username = ''
+                # get website
+                try:
+                    website = WebDriverWait(_driver, 5).until(
+                        EC.presence_of_element_located((By.CSS_SELECTOR,
+                                                        'div._aacl._aaco._aacw._aacz._aada._aade'))
+                    )
+                    website = website.text
+                except Exception as _ex:
+                    website = ''
 
-            # get description
-            try:
-                description = WebDriverWait(_driver, 5).until(
-                    EC.presence_of_element_located((By.CSS_SELECTOR,
-                                                    "h1._aacl._aaco._aacu._aacx._aad7._aade"))
-                )
-                description = description.text
-            except Exception as _ex:
-                description = ''
+                # write info to csv
+                with open(_output, 'a', encoding='utf-8', newline='') as f:
+                    writer = csv.writer(f)
+                    writer.writerow([username, fullname, line[1], category, bio, website, line[2]])
 
-            # write info to csv
-            with open(_output, 'a', encoding='utf-8', newline='') as f:
-                writer = csv.writer(f)
-                writer.writerow([username, location, description])
+                count += 1
 
-            print(username)
-
-            time.sleep(random.randint(1, 2))
-
-            # delete first line in file
-            with open(_input, 'w', encoding='utf-8') as f:
-                f.writelines(lines[1:])
+        # delete count first lines from _input
+        with open(_input, 'r', encoding='utf-8') as f:
+            lines = f.readlines()
+        with open(_input, 'w', encoding='utf-8') as f:
+            for line in lines[count:]:
+                f.write(line)
 
     except Exception as _ex:
         print(_ex)
@@ -131,7 +159,6 @@ def parse_user_api(_input: str, _output: str):
             with open(_input, 'w', encoding='utf-8') as f:
                 f.writelines(lines[1:])
 
-
     except IndexError:
         print('Done')
 
@@ -146,24 +173,27 @@ def main():
     """
 
     # selenium method
-    """try:
-        options = webdriver.ChromeOptions()
+    try:
+
+        """options = webdriver.ChromeOptions()
         ua = UserAgent()
         user_agent = ua.random
         print(user_agent)
-        options.add_argument(f'user-agent={user_agent}')
+        options.add_argument(f'user-agent={user_agent}')"""
+        driver = webdriver.Chrome("""options=options""")
 
-        driver = webdriver.Chrome(options=options)
+        auth(driver, account[0], account[1])
 
-        parse_user_selenium(driver, '110589025635590.csv', 'users_info.csv')
+        parse_user_selenium(driver, 'users_info.csv', 'users_info_extend.csv')
+    except Exception as _ex:
+        print(_ex)
+
+    # api method
+    """try:
+        parse_user_api('users_info.csv', 'users_info_extend.csv')
     except Exception as _ex:
         print(_ex)"""
 
-    # api method
-    try:
-        parse_user_api('users_info.csv', 'users_info_extend.csv')
-    except Exception as _ex:
-        print(_ex)
 
 if __name__ == "__main__":
     main()
