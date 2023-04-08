@@ -109,7 +109,11 @@ def parse_user_selenium(_driver: webdriver, _input: str, _output: str):
                 # write info to csv
                 with open(_output, 'a', encoding='utf-8', newline='') as f:
                     writer = csv.writer(f)
-                    writer.writerow([username, fullname, line[1], category, bio, website, line[2]])
+                    # if no line[1] and line[2] then write empty string
+                    if len(line) == 1:
+                        writer.writerow([username, fullname, '', category, bio, website, ''])
+                    else:
+                        writer.writerow([username, fullname, line[1], category, bio, website, line[2]])
 
                 count += 1
 
@@ -184,7 +188,7 @@ def main():
 
         auth(driver, account[0], account[1])
 
-        parse_user_selenium(driver, 'users_info.csv', 'users_info_extend.csv')
+        parse_user_selenium(driver, 'usernames_similar.csv', 'users_info_extend.csv')
     except Exception as _ex:
         print(_ex)
 
